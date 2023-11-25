@@ -13,32 +13,36 @@ def prime_digit(num):
             return False
     return True
 
-def gcd(a, b):
-    """search the largest divisor of a and b"""
-    while b:
-        a, b = b, a % b
-    return a
-
 def trial_division(n):
-    """Trial division algorithm for factorizing a number"""
+    """Trial Division algorithm for factorizing a number"""
+    if n < 2:
+        return []
+
     factors = []
-    i = 2
-    while i * i <= n:
-        if n % i:
-            i += 1
-        else:
-            n //= i
+    # Divide by 2
+    while n % 2 == 0:
+        factors.append(2)
+        n //= 2
+
+    # Divide by odd numbers starting from 3
+    for i in range(3, int(math.sqrt(n)) + 1, 2):
+        while n % i == 0:
             factors.append(i)
-    if n > 1:
+            n //= i
+
+    # If n is a prime number greater than 2
+    if n > 2:
         factors.append(n)
+
     return factors
 
 def factorize_file(path):
-    """Factorizes digits in the provided file into two prime factors"""
+    """Factorizes digits in the provided file into prime factors"""
     try:
         with open(path) as f:
             n = int(f.read().strip())
             factors = trial_division(n)
+
             if len(factors) == 2 and prime_digit(factors[0]) and prime_digit(factors[1]):
                 print(f"{n}={factors[0]}*{factors[1]}")
             else:
@@ -50,4 +54,5 @@ if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: python rsa.py <filename>")
     else:
+        start_time = time.time()
         factorize_file(sys.argv[1])
