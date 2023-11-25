@@ -1,0 +1,59 @@
+#!/usr/bin/python3
+
+"""Factorize digits into an outcome of two smaller digits"""
+import sys
+import time
+
+def is_prime(n):
+    '''Check if the number is prime'''
+    if n < 2:
+        return False
+    for i in range(2, int(n**0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+def least_prime(n):
+    """Find the smallest prime factor of n"""
+    for i in range(2, n + 1):
+        if n % i == 0 and is_prime(i):
+            return i
+
+def factorize(digit):
+    """Factorize a digit into two smaller digits"""
+    if digit <= 1:
+        return digit, 1
+
+    elem = least_prime(digit)
+    if elem == digit:
+        return digit, 1
+
+    fac = digit // elem
+    return fac, elem
+
+def factorize_file(path):
+    """Factorize digits in the provided file into two smaller digits"""
+    try:
+        with open(path) as f:
+            for line in f:
+                n = int(line.strip())
+                p, q = factorize(n)
+                print(f"{n}={p}*{q}")
+
+                if time.time() - start_time > 5:
+                    print("Execution time exceeded the limit.")
+                    break
+    except FileNotFoundError:
+        print(f"File '{path}' not found.")
+    except ValueError:
+        print("Invalid data in the file.")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        sys.exit(f"Usage: {sys.argv[0]} <path>")
+
+    factors = sys.argv[1]
+
+    start_time = time.time()
+
+    factorize_file(factors)
