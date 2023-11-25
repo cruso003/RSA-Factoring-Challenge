@@ -5,51 +5,37 @@ import sys
 import time
 import random
 
-def is_prime(n, k=5):
-    """Check if a number is prime using the Miller-Rabin primality test"""
-    if n <= 1:
-        return False
-    if n == 2 or n == 3:
-        return True
+def gcd(a, b):
+    """Calculate the greatest common divisor of a and b"""
+    while b:
+        a, b = b, a % b
+    return a
+
+def pollards_rho(n):
+    """Pollard's rho algorithm for factorization"""
     if n % 2 == 0:
-        return False
+        return 2
 
-    # Write n as 2^r * d + 1
-    r, d = 0, n - 1
-    while d % 2 == 0:
-        r += 1
-        d //= 2
+    x = random.randint(1, n - 1)
+    y = x
+    c = random.randint(1, n - 1)
+    d = 1
 
-    # Witness loop
-    for _ in range(k):
-        a = random.randint(2, n - 2)
-        x = pow(a, d, n)
-        if x == 1 or x == n - 1:
-            continue
+    f = lambda x: (x**2 + c) % n
 
-        for _ in range(r - 1):
-            x = pow(x, 2, n)
-            if x == n - 1:
-                break
-        else:
-            return False
+    while d == 1:
+        x = f(x)
+        y = f(f(y))
+        d = gcd(abs(x - y), n)
 
-    return True
-
-def least_prime(n):
-    """Find the smallest prime factor of n"""
-    if n <= 1:
-        return n
-    for i in range(2, n + 1):
-        if n % i == 0 and is_prime(i):
-            return i
+    return d
 
 def factorize(n):
     """Factorize a number into two prime numbers"""
     if n <= 1:
         return n, 1
 
-    elem = least_prime(n)
+    elem = pollards_rho(n)
     if elem == n:
         return n, 1
 
