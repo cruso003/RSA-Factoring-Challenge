@@ -1,68 +1,56 @@
 #!/usr/bin/python3
 
-"""Factorize a number into two prime numbers"""
 import sys
 import time
-import random
+import math
+
+def prime_digit(num):
+    """search if a digit is prime"""
+    if num < 2:
+        return False
+    for k in range(2, int(math.sqrt(num)) + 1):
+        if num % k == 0:
+            return False
+    return True
 
 def gcd(a, b):
-    """Calculate the greatest common divisor of a and b"""
+    """search the largest divisor of a and b"""
     while b:
         a, b = b, a % b
     return a
 
-def pollards_rho(n):
-    """Pollard's rho algorithm for factorization"""
+def pollard_rho(n):
+    """Pollard's rho algorithm for factorizing a number"""
     if n % 2 == 0:
-        return 2
+        return 2, n // 2
 
-    x = random.randint(1, n - 1)
-    y = x
-    c = random.randint(1, n - 1)
+    x = 2
+    y = 2
     d = 1
-
-    f = lambda x: (x**2 + c) % n
+    f = lambda val: (val * val + 1) % n
 
     while d == 1:
         x = f(x)
         y = f(f(y))
         d = gcd(abs(x - y), n)
 
-    return d
-
-def factorize(n):
-    """Factorize a number into two prime numbers"""
-    if n <= 1:
-        return n, 1
-
-    elem = pollards_rho(n)
-    if elem == n:
-        return n, 1
-
-    fac = n // elem
-    return fac, elem
+    return d, n // d
 
 def factorize_file(path):
-    """Factorize a number in the provided file into two prime numbers"""
+    """Factorizes digits in the provided file into two prime factors"""
     try:
         with open(path) as f:
             n = int(f.read().strip())
-            p, q = factorize(n)
-            print(f"{n} = {p} * {q}")
-
-            if time.time() - start_time > 5:
-                print("Execution time exceeded the limit.")
+            p, q = pollard_rho(n)
+            if p is not None and q is not None and prime_digit(p) and prime_digit(q):
+                print(f"{n}={p}*{q}")
+            else:
+                print(f"Couldn't find two prime factors for {n}")
     except FileNotFoundError:
-        print(f"File '{path}' not found.")
-    except ValueError:
-        print("Invalid data in the file.")
+        print("File not found.")
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        sys.exit(f"Usage: {sys.argv[0]} <path>")
-
-    factors = sys.argv[1]
-
-    start_time = time.time()
-
-    factorize_file(factors)
+        print("Usage: python rsa.py <filename>")
+    else:
+        factorize_file(sys.argv[1])
