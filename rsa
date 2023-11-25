@@ -1,58 +1,68 @@
 #!/usr/bin/python3
 
+"""Factorize a number into two prime numbers"""
 import sys
 import time
-import math
+import random
 
-def prime_digit(num):
-    """search if a digit is prime"""
-    if num < 2:
-        return False
-    for k in range(2, int(math.sqrt(num)) + 1):
-        if num % k == 0:
-            return False
-    return True
+def gcd(a, b):
+    """Calculate the greatest common divisor of a and b"""
+    while b:
+        a, b = b, a % b
+    return a
 
-def trial_division(n):
-    """Trial Division algorithm for factorizing a number"""
-    if n < 2:
-        return []
+def pollards_rho(n):
+    """Pollard's rho algorithm for factorization"""
+    if n % 2 == 0:
+        return 2
 
-    factors = []
-    # Divide by 2
-    while n % 2 == 0:
-        factors.append(2)
-        n //= 2
+    x = random.randint(1, n - 1)
+    y = x
+    c = random.randint(1, n - 1)
+    d = 1
 
-    # Divide by odd numbers starting from 3
-    for i in range(3, int(math.sqrt(n)) + 1, 2):
-        while n % i == 0:
-            factors.append(i)
-            n //= i
+    f = lambda x: (x**2 + c) % n
 
-    # If n is a prime number greater than 2
-    if n > 2:
-        factors.append(n)
+    while d == 1:
+        x = f(x)
+        y = f(f(y))
+        d = gcd(abs(x - y), n)
 
-    return factors
+    return d
+
+def factorize(n):
+    """Factorize a number into two prime numbers"""
+    if n <= 1:
+        return n, 1
+
+    elem = pollards_rho(n)
+    if elem == n:
+        return n, 1
+
+    fac = n // elem
+    return fac, elem
 
 def factorize_file(path):
-    """Factorizes digits in the provided file into prime factors"""
+    """Factorize a number in the provided file into two prime numbers"""
     try:
         with open(path) as f:
             n = int(f.read().strip())
-            factors = trial_division(n)
+            p, q = factorize(n)
+            print(f"{n} = {p} * {q}")
 
-            if len(factors) == 2 and prime_digit(factors[0]) and prime_digit(factors[1]):
-                print(f"{n}={factors[0]}*{factors[1]}")
-            else:
-                print(f"Couldn't find two prime factors for {n}")
+            if time.time() - start_time > 5:
+                print("Execution time exceeded the limit.")
     except FileNotFoundError:
-        print("File not found.")
+        print(f"File '{path}' not found.")
+    except ValueError:
+        print("Invalid data in the file.")
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python rsa.py <filename>")
-    else:
-        start_time = time.time()
-        factorize_file(sys.argv[1])
+        sys.exit(f"Usage: {sys.argv[0]} <path>")
+
+    factors = sys.argv[1]
+
+    start_time = time.time()
+
+    factorize_file(factors)
