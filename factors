@@ -3,26 +3,6 @@
 """Factorize digits into an outcome of two smaller digits"""
 import sys
 import time
-import random
-
-def gcd(a, b):
-    while b:
-        a, b = b, a % b
-    return a
-
-def pollards_rho(n):
-    if n % 2 == 0:
-        return 2
-    x = random.randint(1, n-1)
-    y = x
-    c = random.randint(1, n-1)
-    d = 1
-    f = lambda x: (x**2 + c) % n
-    while d == 1:
-        x = f(x)
-        y = f(f(y))
-        d = gcd(abs(x - y), n)
-    return d
 
 def least_prime(n):
     """Find the smallest prime factor of n"""
@@ -30,10 +10,18 @@ def least_prime(n):
         return n
     if n % 2 == 0:
         return 2
-    for prime in [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]:
-        if n % prime == 0:
-            return prime
-    return pollards_rho(n)
+    if n % 3 == 0:
+        return 3
+    if n % 5 == 0:
+        return 5
+    if n % 7 == 0:
+        return 7
+
+    # Skip multiples of 2, 3, 5, and 7
+    for i in range(11, int(n**0.5) + 1, 2):
+        if n % i == 0:
+            return i
+    return n
 
 def factorize(digit):
     """Factorize a digit into two smaller digits"""
