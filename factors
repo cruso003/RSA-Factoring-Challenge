@@ -9,19 +9,11 @@ PRIMES = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]
 
 def least_prime(n):
     """Find the smallest prime factor of n"""
-    if n < 2:
-        return n
-
     for prime in PRIMES:
         if n % prime == 0:
             return prime
-
-    candidate = PRIMES[-1] + 2
-    while candidate * candidate <= n:
-        if n % candidate == 0:
-            return candidate
-        candidate += 2 
-
+        if prime * prime > n:
+            return n
     return n
 
 def factorize(digit):
