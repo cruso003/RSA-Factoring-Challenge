@@ -4,20 +4,25 @@
 import sys
 import time
 
-def is_prime(n):
-    '''Check if the number is prime'''
-    if n < 2:
-        return False
-    for i in range(2, int(n**0.5) + 1):
-        if n % i == 0:
-            return False
-    return True
+
+PRIMES = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]
 
 def least_prime(n):
     """Find the smallest prime factor of n"""
-    for i in range(2, n + 1):
-        if n % i == 0 and is_prime(i):
-            return i
+    if n < 2:
+        return n
+
+    for prime in PRIMES:
+        if n % prime == 0:
+            return prime
+
+    candidate = PRIMES[-1] + 2
+    while candidate * candidate <= n:
+        if n % candidate == 0:
+            return candidate
+        candidate += 2 
+
+    return n
 
 def factorize(digit):
     """Factorize a digit into two smaller digits"""
