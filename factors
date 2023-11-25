@@ -4,7 +4,6 @@
 import sys
 import time
 
-# Generate a list of prime numbers
 def generate_primes(limit):
     primes = [2]
     for num in range(3, limit + 1, 2):
@@ -13,15 +12,17 @@ def generate_primes(limit):
             primes.append(num)
     return primes
 
-PRIMES = generate_primes(10000)  # Adjust the limit based on your requirements
+PRIMES = generate_primes(1000)
 
 def least_prime(n):
     """Find the smallest prime factor of n"""
+    if n <= 1:
+        return n
     for prime in PRIMES:
         if n % prime == 0:
             return prime
         if prime * prime > n:
-            return n
+            break
     return n
 
 def factorize(digit):
