@@ -19,31 +19,28 @@ def gcd(a, b):
         a, b = b, a % b
     return a
 
-def pollard_rho(n):
-    """Pollard's rho algorithm for factorizing a number"""
-    if n % 2 == 0:
-        return 2, n // 2
-
-    x = 2
-    y = 2
-    d = 1
-    f = lambda val: (val * val + 1) % n
-
-    while d == 1:
-        x = f(x)
-        y = f(f(y))
-        d = gcd(abs(x - y), n)
-
-    return d, n // d
+def trial_division(n):
+    """Trial division algorithm for factorizing a number"""
+    factors = []
+    i = 2
+    while i * i <= n:
+        if n % i:
+            i += 1
+        else:
+            n //= i
+            factors.append(i)
+    if n > 1:
+        factors.append(n)
+    return factors
 
 def factorize_file(path):
     """Factorizes digits in the provided file into two prime factors"""
     try:
         with open(path) as f:
             n = int(f.read().strip())
-            p, q = pollard_rho(n)
-            if p is not None and q is not None and prime_digit(p) and prime_digit(q):
-                print(f"{n}={p}*{q}")
+            factors = trial_division(n)
+            if len(factors) == 2 and prime_digit(factors[0]) and prime_digit(factors[1]):
+                print(f"{n}={factors[0]}*{factors[1]}")
             else:
                 print(f"Couldn't find two prime factors for {n}")
     except FileNotFoundError:
