@@ -1,0 +1,82 @@
+#!/usr/bin/python3
+
+"""Factorize a number into two prime numbers"""
+import sys
+import time
+import random
+
+def is_prime(n, k=5):
+    """Check if a number is prime using the Miller-Rabin primality test"""
+    if n <= 1:
+        return False
+    if n == 2 or n == 3:
+        return True
+    if n % 2 == 0:
+        return False
+
+    # Write n as 2^r * d + 1
+    r, d = 0, n - 1
+    while d % 2 == 0:
+        r += 1
+        d //= 2
+
+    # Witness loop
+    for _ in range(k):
+        a = random.randint(2, n - 2)
+        x = pow(a, d, n)
+        if x == 1 or x == n - 1:
+            continue
+
+        for _ in range(r - 1):
+            x = pow(x, 2, n)
+            if x == n - 1:
+                break
+        else:
+            return False
+
+    return True
+
+def least_prime(n):
+    """Find the smallest prime factor of n"""
+    if n <= 1:
+        return n
+    for i in range(2, n + 1):
+        if n % i == 0 and is_prime(i):
+            return i
+
+def factorize(n):
+    """Factorize a number into two prime numbers"""
+    if n <= 1:
+        return n, 1
+
+    elem = least_prime(n)
+    if elem == n:
+        return n, 1
+
+    fac = n // elem
+    return fac, elem
+
+def factorize_file(path):
+    """Factorize a number in the provided file into two prime numbers"""
+    try:
+        with open(path) as f:
+            n = int(f.read().strip())
+            p, q = factorize(n)
+            print(f"{n} = {p} * {q}")
+
+            if time.time() - start_time > 5:
+                print("Execution time exceeded the limit.")
+    except FileNotFoundError:
+        print(f"File '{path}' not found.")
+    except ValueError:
+        print("Invalid data in the file.")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        sys.exit(f"Usage: {sys.argv[0]} <path>")
+
+    factors = sys.argv[1]
+
+    start_time = time.time()
+
+    factorize_file(factors)
